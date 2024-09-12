@@ -384,6 +384,7 @@ namespace HPACK
 					throw std::invalid_argument("HPACK::huffman_tree_t::decode(): Overly long input string");
 
 				for ( unsigned int idx = 0; idx < src.length(); idx++ ) {
+                    bool has_value = false;
 					for ( int8_t j = 7; j >= 0; j-- ) {
 						if ( ( src[ idx ] & ( 1 << j ) ) > 0 ) {
 							if ( nullptr == current->right() )
@@ -404,8 +405,12 @@ namespace HPACK
 							
 							dst += static_cast< uint8_t >( code & 0xFF );
 							current = m_root;
+                            has_value = true;
 						}
 					}
+                    if (!has_value) {
+                        throw std::runtime_error("HPACK::huffman_tree_t::decode(): Invaild huffman code format");
+                    }
 				}
 
 				return dst;
